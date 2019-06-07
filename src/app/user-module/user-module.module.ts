@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { ToastrModule } from 'ngx-toastr';
 import { RouterModule } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NgxSpinnerModule } from 'ngx-spinner';
 import * as $ from 'jquery';
 
 let config = new AuthServiceConfig([
@@ -25,6 +26,7 @@ export function provideConfig() {
   declarations: [LoginComponent, SignupComponent],
   imports: [
     CommonModule, SocialLoginModule, FormsModule, BrowserAnimationsModule,
+    NgxSpinnerModule,
     ToastrModule.forRoot() ,
     RouterModule.forChild([
       { path: 'signup', component: SignupComponent },

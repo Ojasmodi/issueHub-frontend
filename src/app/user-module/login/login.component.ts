@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { UserManagementService } from 'src/app/user-management.service';
 import { CookieService } from 'ngx-cookie-service';
+import { NgxSpinnerService } from 'ngx-spinner';
 import { SocialUser, AuthService, GoogleLoginProvider } from 'angularx-social-login';
 declare var $: any
 
@@ -21,7 +22,7 @@ export class LoginComponent implements OnInit {
 
   constructor(public _route: ActivatedRoute, public router: Router, private toastr: ToastrService,
     private appService: UserManagementService, private cookieService: CookieService,
-    private authService: AuthService) {
+    private authService: AuthService,public spinner: NgxSpinnerService) {
   }
 
   ngOnInit() {
@@ -33,12 +34,13 @@ export class LoginComponent implements OnInit {
     }
     else {
       $('#exampleModal').modal('toggle');
-      this.toastr.show("Please wait...", "Processing your request")
+      this.spinner.show();
       let data = {
         email: this.forget_email
       }
       this.appService.resetPassword(data)
         .subscribe((apiResponse) => {
+          this.spinner.hide()
           if (apiResponse['status'] === 200) {
             console.log(apiResponse)
             this.toastr.success("Please login again.", "Your password has been sent to your registered email");
@@ -51,6 +53,7 @@ export class LoginComponent implements OnInit {
             this.toastr.error(apiResponse['message']);
           }
         }, (err) => {
+          this.spinner.hide()
           this.toastr.error('Some error occured.')
         });
 
@@ -68,6 +71,7 @@ export class LoginComponent implements OnInit {
       this.toastr.warning('enter password')
     }
     else {
+      this.spinner.show()
       this.signIn();
     }
   } // end signinFunction
@@ -81,7 +85,7 @@ export class LoginComponent implements OnInit {
 
     this.appService.signinFunction(data)
       .subscribe((apiResponse) => {
-
+        this.spinner.hide()
         if (apiResponse.status === 200) {
           console.log(apiResponse)
           this.cookieService.delete('authToken')
@@ -101,10 +105,10 @@ export class LoginComponent implements OnInit {
 
 
         } else {
-
           this.toastr.error(apiResponse.message)
         }
       }, (err) => {
+        this.spinner.hide()
         this.toastr.error('Some error occured')
       });
 
@@ -118,9 +122,10 @@ export class LoginComponent implements OnInit {
         firstName: user.firstName,
         lastName: user.lastName
       }
+      this.spinner.show()
       this.appService.signinWithGoogle(data)
         .subscribe((apiResponse) => {
-
+          this.spinner.hide()
           if (apiResponse.status === 200) {
             console.log(apiResponse)
             this.cookieService.delete('authToken')
@@ -143,6 +148,7 @@ export class LoginComponent implements OnInit {
             this.toastr.error("error")
           }
         }, (err) => {
+          this.spinner.hide()
           this.toastr.error('Some error occured')
 
         });

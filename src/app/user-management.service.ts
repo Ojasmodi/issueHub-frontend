@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
 })
 export class UserManagementService {
 
-  private url = 'http://localhost:3000';
+  private url = 'http://issueback.myinfo.world';
   constructor(public http: HttpClient, private cookieService: CookieService) { 
   }
 

@@ -7,7 +7,7 @@ import { CookieService } from 'ngx-cookie-service';
 })
 export class IssueServiceService {
 
-  private url = 'http://localhost:3000';
+  private url = 'http://issueback.myinfo.world';
 
   constructor(public http: HttpClient, public cookieService: CookieService) {
   }

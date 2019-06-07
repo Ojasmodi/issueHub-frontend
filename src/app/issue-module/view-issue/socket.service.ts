@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
 })
 export class SocketService {
 
-  private url = 'http://localhost:3000';
+  private url = 'http://issueback.myinfo.world';
   private socket;
 
   constructor(public http: HttpClient, public cookieService: CookieService) {

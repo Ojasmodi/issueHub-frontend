@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { UserManagementService } from 'src/app/user-management.service';
 import { CookieService } from 'ngx-cookie-service';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'app-signup',
@@ -21,7 +22,8 @@ export class SignupComponent implements OnInit {
     public appService: UserManagementService,
     public router: Router,
     private toastr: ToastrService,
-    public cookieService: CookieService) {
+    public cookieService: CookieService,
+    private spinner: NgxSpinnerService) {
   }
 
   ngOnInit() {
@@ -53,7 +55,7 @@ export class SignupComponent implements OnInit {
       this.toastr.warning('Enter password.')
     }
     else {
-
+      this.spinner.show()
       const data = {
         firstName: this.firstName.trim(),
         lastName: this.lastName.trim(),
@@ -66,7 +68,7 @@ export class SignupComponent implements OnInit {
       this.appService.signupFunction(data)
         .subscribe((apiResponse) => {
 
-          //console.log(apiResponse);
+          this.spinner.hide()
 
           if (apiResponse.status === 200) {
 
@@ -82,7 +84,7 @@ export class SignupComponent implements OnInit {
           }
 
         }, (err) => {
-
+          this.spinner.hide()
           this.toastr.error('Some error occured.');
 
         });
