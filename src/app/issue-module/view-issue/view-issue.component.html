@@ -1,0 +1,141 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark text-white text-capitalize sticky-top mat-elevation-z8">
+  <a class="navbar-brand">
+    <img src="./../../../assets/issues.jpg" width="30" height="30" class="d-inline-block align-top" alt="">
+    Issue-Hub
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText"
+    aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarText">
+    <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+      <li class="nav-item">
+        <a class="nav-link" routerLink='/dashboard'>Dashboard <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink='/viewAll'>All Issues</a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link">View issue</a>
+      </li>
+    </ul>
+    <span class="form-inline my-2 my-lg-0">
+      <button class="btn btn-outline-info my-2 my-sm-0" (click)="logout()">Logout({{userName}})</button>
+    </span>
+  </div>
+</nav>
+<br>
+<div *ngIf="issueNotFound">
+  <img src="./../../../assets/images.jpg" alt="Not found" class="img-fluid rounded mx-auto d-block img-responsive">
+</div>
+
+<div class="container p-4" *ngIf="!issueNotFound">
+
+  <div class="card mat-elevation-z8" style='margin: "2%"' *ngIf="currentIssue">
+    <div class="card-header text-center font-weight-bold bg-secondary text-white">
+      Title: {{currentIssue.title}}
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col">
+          <button class="btn btn-outline-dark btn-sm float-right" [disabled]="watcherPresent"
+            (click)="addToWatchers()">Add
+            yourself to watcher's list</button>
+        </div>
+      </div>
+
+
+      <div class="row">
+        <div class="col-sm-6">
+          <img class="img-responsive" [src]="currentIssue.screenshot" alt="Smiley face" height="100%" width="100%">
+
+        </div>
+        <div class="col-sm-6">
+          <form class="text-responsive">
+            <div class="form-group">
+              <label class="text-info font-weight-bold">Status:</label>
+              <input type="text" class="input-group input-sm mb-3" disabled [value]="currentIssue.status">
+            </div>
+            <div class="form-group">
+              <label class="text-info font-weight-bold">Description:</label>
+              <div [innerHtml]="currentIssue.description"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="text-info font-weight-bold">Reported By:</label>
+              <input type="text" class="input-group input-group-sm mb-3 text-capitalize" disabled
+                [value]="currentIssue.reportedBy">
+            </div>
+            <div class="form-group">
+              <label class="text-info font-weight-bold">Created On:</label>
+              <textarea type="text" class="input-group input-group-sm mb-3"
+                disabled>{{currentIssue.createdOn|date}}</textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="text-info font-weight-bold">Assignees:</label>
+              <div class="row" *ngFor="let assignee of allAssignees">
+                <div class="col-sm">
+                  {{assignee.assignedToName}}
+                  <button mat-icon-button color="warn" matTooltip="Delete Issue" (click)="deleteAssignee(assignee)">
+                    <mat-icon>delete_outline</mat-icon>
+                  </button>
+                </div>
+              </div>
+              <div *ngIf="allAssignees.length==0">
+                No assigned to anyone.
+              </div>
+            </div>
+
+            <div class="form-group" *ngIf="canAssignIssueToOtherUsers || currentIssue.reportedByUserId==this.userId">
+              <label class="text-info font-weight-bold">Add assignee</label>
+              <select class="text-capitalize form-control form-control-sm" [(ngModel)]="currentAssignee"
+                name="currentAssignee">
+                <option *ngFor="let user of allUsers" [ngValue]="user">{{user.firstName+" "+user.lastName}}</option>
+              </select>
+              <button class="btn btn-success btn-sm m-1" (click)="addAssignee()">Add assignee</button>
+            </div>
+            <div class="form-group">
+              <label class="text-info font-weight-bold">Watchers:</label>
+              <div *ngIf="allWatchers.length==0">
+                  No watchers yet.
+              </div>
+              <ul class="list-group watcher" *ngIf="allWatchers">
+                <li *ngFor="let watcher of allWatchers" class="list-group-item">{{watcher.userName}}</li>
+              </ul>
+            </div>
+            <br>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <br>
+  <br>
+  <div>
+
+    <div *ngIf="allComments">
+      <h4>Comment:</h4>
+      <textarea type="text" class="form-control" [(ngModel)]="comment" name="comment"></textarea>
+      <button class="btn btn-primary btn-sm m-1" (click)="addComment()">Add Comment</button>
+    </div>
+
+    <div *ngIf="allComments">
+      <div *ngFor="let comment of allComments">
+        <div class="card border border-primary">
+          <div class="card-body bg-dark text-white text-capitalize">
+            <div class="text-success"><b>{{comment.creatorName}}&nbsp;</b><span
+                class="text-white">{{comment.comment}}<span *ngIf="comment.creatorId==userId"><button
+                    class="float-right" mat-icon-button color="warn" matTooltip="Delete Issue"
+                    (click)="deleteComment(comment)">
+                    <mat-icon>delete_outline</mat-icon>
+                  </button></span></span></div>
+            <span class="card-text text-muted text-small">{{comment.createdOn|date}}</span>
+          </div>
+        </div><br>
+      </div>
+    </div>
+
+  </div>

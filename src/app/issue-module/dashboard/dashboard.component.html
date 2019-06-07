@@ -1,0 +1,138 @@
+<body>
+  <nav class="navbar navbar-expand-sm navbar-dark bg-dark text-white text-capitalize sticky-top mat-elevation-z8">
+    <a class="navbar-brand">
+      <img src="./../../../assets/issues.jpg" width="30" height="30" class="d-inline-block align-top" alt="">
+      Issue-Hub
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText"
+      aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarText">
+      <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+        <li class="nav-item active">
+          <a class="nav-link" routerLink='/dashboard'>Dashboard <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink='/viewAll'>All Issues</a>
+        </li>
+      </ul>
+      <span class="nav justify-content-end my-2 my-lg-0">
+        <button class="btn btn-outline-info my-2 my-sm-0" (click)="logout()">Logout({{userName}})</button>
+      </span>
+    </div>
+  </nav>
+  <br>
+
+  <div class="container">
+    <div class="row justify-content-center">
+      <button class="mat-elevation-z8 btn btn-info btn-sm text-center " data-toggle="modal"
+        data-target="#exampleModal1">Have An Issue? Click here.</button>
+    </div>
+
+    <br>
+    <div
+      style='background-color: rgb(21, 17, 75);padding:5px;color: rgb(248, 245, 245);height: 7%;width:100%;font-size: 1.5rem'
+      class="mat-elevation-z8 text-responsive"><b><u>Issues Assigned to you</u>-</b></div>
+    <div class="search-div" style="margin:2%">
+      <mat-form-field class="search-form-field" floatLabel="never">
+        <input matInput [(ngModel)]="searchKey" placeholder="Search for an issue" autocomplete="off"
+          (keyup)="applyFilter()">
+        <button mat-button matSuffix mat-icon-button aria-label="Clear" *ngIf="searchKey" (click)="onSearchClear()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+    </div>
+    <div class="mat-elevation-z8">
+      <mat-table [dataSource]="issuesAssignedToLoginUser" matSort>
+        <ng-container matColumnDef="Status">
+          <mat-header-cell *matHeaderCellDef mat-sort-header>Status </mat-header-cell>
+          <mat-cell *matCellDef="let element">{{element.status}} </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="Title">
+          <mat-header-cell *matHeaderCellDef mat-sort-header>Title</mat-header-cell>
+          <mat-cell *matCellDef="let element">{{element.title}} </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="ReportedBy">
+          <mat-header-cell *matHeaderCellDef mat-sort-header> Reported By</mat-header-cell>
+          <mat-cell *matCellDef="let element">{{element.reportedBy}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="CreatedOn">
+          <mat-header-cell *matHeaderCellDef>Created On</mat-header-cell>
+          <mat-cell *matCellDef="let element">{{element.createdOn | date}} </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="Actions">
+          <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            <button mat-icon-button matTooltip="View Issue" (click)="viewIssue(element.issueId)">
+              <mat-icon>launch</mat-icon>
+            </button>
+            <a mat-icon-button matTooltip="Edit Issue" *ngIf="userId==element.reportedByUserId"
+              (click)="editIssue(element.issueId)">
+              <mat-icon>edit</mat-icon>
+            </a>
+            <button mat-icon-button color="warn" *ngIf="userId==element.reportedByUserId" matTooltip="Delete Issue"
+              (click)="deleteIssue(element.issueId)">
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="noData">
+          <mat-footer-cell *matFooterCellDef colspan="6">
+            No issues assigned to you.
+          </mat-footer-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+        <mat-footer-row *matFooterRowDef="['noData']" [ngClass]="{'hide':issuesAssignedToLoginUser!=null}">
+        </mat-footer-row>
+      </mat-table>
+      <mat-paginator [pageSizeOptions]="[2, 5, 10]" [pageSize]="2" showFirstLastButtons></mat-paginator>
+    </div>
+  </div>
+</body>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Issue-Form</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <mat-form-field class="example-full-width">
+              <input matInput placeholder="Title" name="title" [(ngModel)]="title">
+            </mat-form-field>
+            <br>
+          </div>
+
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <label class="input-group-text" for="inputGroupSelect01">Status</label>
+            </div>
+            <select class="custom-select" [(ngModel)]="status" name="status">
+              <option *ngFor="let status of issueTypes" [value]="status"> {{status}}</option>
+            </select>
+          </div>
+
+          <div class="text">Description:</div>
+          <quill-editor [(ngModel)]='description' class="mb-3" name="description"></quill-editor>
+
+          <div class="m-2"><input type="file" (change)="onImagePicked($event)">
+            <small id="emailHelp" class="form-text text-muted">*less than 5MB and format-png, jpg, jpeg only.</small>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="button mat-elevation-z8 btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
+        <button class=" mat-elevation-z8 btn btn-sm btn-success" (click)="createIssue()">Submit Issue</button>
+      </div>
+    </div>
+  </div>
+</div>

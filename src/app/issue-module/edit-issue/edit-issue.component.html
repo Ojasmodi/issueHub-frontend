@@ -1,0 +1,75 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark text-white text-capitalize sticky-top mat-elevation-z8">
+  <a class="navbar-brand">
+    <img src="./../../../assets/issues.jpg" width="30" height="30" class="d-inline-block align-top" alt="">
+    Issue-Hub
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText"
+    aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarText">
+    <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+      <li class="nav-item">
+        <a class="nav-link" routerLink='/dashboard'>Dashboard <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink='/viewAll'>All Issues</a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link">Update issue</a>
+      </li>
+    </ul>
+    <span class="form-inline my-2 my-lg-0">
+      <button class="btn btn-outline-info my-2 my-sm-0" (click)="logout()">Logout({{userName}})</button>
+    </span>
+  </div>
+</nav>
+<br>
+
+<div class="container">
+  <div class="card mat-elevation-z8 m-4" style='margin: "2%";' *ngIf="currentIssue">
+    <div class="card-header text-center font-weight-bold bg-secondary text-white">
+      Title: {{currentIssue.title}}
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-sm-6">
+          <img class="img-responsive" [src]="currentIssue.screenshot" alt="Smiley face" height="100%" width="100%">
+
+        </div>
+        <div class="col-sm-6">
+          <form class="text-responsive">
+            <div class="form-group">
+              <label class="text-info font-weight-bold">Title:</label>
+              <br>
+              <input type="text" [(ngModel)]='currentIssue.title' name="title">
+            </div>
+            <div>
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <label class="input-group-text" for="inputGroupSelect01">Status:</label>
+                </div>
+                <select class="custom-select" [(ngModel)]="status" name="status">
+                  <option *ngFor="let status of issueStatus" [selected]="status==currentIssue.status" [value]="status">
+                    {{status}}</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="text-info font-weight-bold">Description</label>
+              <quill-editor [(ngModel)]='currentIssue.description' name="description"></quill-editor>
+            </div>
+            <div class="m-2"><input type="file" (change)="onImagePicked($event)">
+              <small id="emailHelp" class="form-text text-muted">*less than 5MB and format-png, jpg, jpeg only.</small>
+            </div>
+            <br>
+            <br>
+            <button class=" mat-elevation-z8 btn btn-sm btn-success" (click)="updateIssue()">Update Issue</button>
+            <br>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,77 @@
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark  text-white sticky-top">
+  <a class="navbar-brand">
+    <img src="./../../../assets/issues.jpg" width="30" height="30" class="d-inline-block align-top" alt="">
+    Issue-Hub
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="nav navbar-nav ml-auto">
+      <li class="nav-item active">
+        <a class="nav-link" routerLink='/login'>Sign-in<span class="sr-only">(current)</span></a>
+      </li>
+    </ul>
+  </div>
+</nav>
+<div class="row p-0 m-2">
+
+  <div class="col-sm"></div>
+
+  <div class="col-sm p-4 border border-dark">
+
+    <h2 class="form-signin-heading">Sign Up To continue...</h2>
+
+    <br>
+
+    <span>FirstName: </span>
+
+    <label for="inputFirstName" class="sr-only">FirstName</label>
+
+    <input type="text" id="inputFirstName" class="form-control" [(ngModel)]="firstName" placeholder="FirstName" required
+      autofocus>
+    <small id="emailHelp" class="form-text text-muted">*required.</small>
+    <br>
+
+    <span>LastName: </span>
+
+    <label for="inputLastName" class="sr-only">LastName</label>
+
+    <input type="text" id="inputLastName" class="form-control" [(ngModel)]="lastName" placeholder="LastName" required>
+    <small id="emailHelp" class="form-text text-muted">*required.</small>
+    <br>
+
+    <span>Mobile: </span>
+
+    <label for="inputMobile" class="sr-only">Mobile</label>
+
+    <input type="number" id="inputMobile" class="form-control" [(ngModel)]="mobile" placeholder="Mobile" required>
+    <small id="emailHelp" class="form-text text-muted">*required.</small>
+    <br>
+
+    <span>Email: </span>
+
+    <label for="inputEmail" class="sr-only">Email address</label>
+
+    <input type="email" id="inputEmail" class="form-control" [(ngModel)]="email" placeholder="Email address" required>
+    <small id="emailHelp" class="form-text text-muted">*Enter valid email. We'll never share your email with anyone
+      else.</small>
+    <br>
+
+    <span>Password: </span>
+
+    <label for="inputPassword" class="sr-only">Password</label>
+
+    <input type="password" id="inputPassword" class="form-control" [(ngModel)]="password" placeholder="Password"
+      required>
+    <small id="emailHelp" class="form-text text-muted">*required.</small>
+    <br>
+
+
+    <button class="btn btn-lg btn-info btn-block" type="button" (click)="signupFunction()">Sign Up</button>
+
+  </div>
+
+  <div class="col-sm"></div>
+
+</div>

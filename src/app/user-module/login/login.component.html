@@ -1,0 +1,84 @@
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark  text-white sticky-top">
+  <a class="navbar-brand">
+    <img src="./../../../assets/issues.jpg" width="30" height="30" class="d-inline-block align-top" alt="">
+    Issue-Hub
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="nav navbar-nav ml-auto">
+      <li class="nav-item active">
+        <a class="nav-link" routerLink='/signup'>Signup<span class="sr-only">(current)</span></a>
+      </li>
+    </ul>
+  </div>
+</nav>
+<div class="jumbotron">
+    <h1 class="display-4">Welcome to Issue-Hub</h1>
+    <p class="lead">Report your issues if any, and help others to solve their issues.</p>
+</div>
+
+<div class="row p-0 m-2 bg-light ">
+
+    <div class="col-sm"></div>
+  
+    <div class="col-sm p-4 border border-dark">
+  
+      <h2 class="form-signin-heading">Sign In</h2>
+  
+      <br>
+      <span>Email: </span>
+  
+      <label for="inputEmail" class="sr-only">Email address</label>
+  
+      <input type="email" class="input-group input-sm mb-3" id="inputEmail" class="form-control" [(ngModel)]="email" placeholder="Email address" required>
+      <small id="emailHelp" class="form-text text-muted">*Enter valid email.</small>
+      <br>
+  
+      <span>Password: </span>
+  
+      <label for="inputPassword" class="sr-only">Password</label>
+      
+      <input type="password" class="input-group input-sm mb-3" id="inputPassword" class="form-control" [(ngModel)]="password" placeholder="Password" required>
+      <small class="form-text text-muted">*required.</small>
+      <br>
+      <span><button class="btn btn-md btn-success" type="button" (click)="signin()">Sign In</button></span>
+      <span><button class="btn btn-md btn-danger m-1" type="button" (click)=" signInWithGoogle()">Google</button></span>
+      <span>
+        <button class="btn btn-md btn-warning"  data-toggle="modal" data-target="#exampleModal">
+        Forgot-Password
+        </button>
+      </span>
+  
+    </div>
+  
+  <div class="col-sm"></div>
+  </div>
+  
+
+  
+<!-- Modal -->
+ <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Forgot-Password</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input type="text" [(ngModel)]="forget_email" required class="form-control"
+            placeholder="Enter registered email only" name="forget_email">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-info" (click)="resetPassword()">Request-password</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
