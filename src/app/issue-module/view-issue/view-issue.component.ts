@@ -6,6 +6,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { Subscription } from 'rxjs';
 import { SocketService } from './socket.service';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'app-view-issue',
@@ -40,7 +41,7 @@ export class ViewIssueComponent implements OnInit {
   liveConSubs: Subscription
 
   constructor(public issueService: IssueServiceService, public toastrService: ToastrService, public _route: ActivatedRoute,
-    public router: Router, public userManagementService: UserManagementService, public socketService: SocketService, public cookieService: CookieService) {
+    public router: Router,private spinner: NgxSpinnerService, public userManagementService: UserManagementService, public socketService: SocketService, public cookieService: CookieService) {
     this.userName = this.cookieService.get('userName');
   }
 
@@ -48,6 +49,7 @@ export class ViewIssueComponent implements OnInit {
     this.authToken = this.cookieService.get('authToken');
     this.userId = this.cookieService.get('userId')
     this.userInfo = this.userManagementService.getUserInfoFromLocalStorage();
+    this.spinner.show()
     this.checkStatus();
     this.verifyUserConfirmation()
     this.updatedAssigneeList();
@@ -58,7 +60,9 @@ export class ViewIssueComponent implements OnInit {
     this.callDisconnectedSocket();
 
     this.currentIssueId = this._route.snapshot.paramMap.get('id');
-    this.issueService.getSingleIssue(this.currentIssueId).subscribe((apiResponse) => {
+    this.issueService.getSingleIssue(this.currentIssueId).subscribe((apiResponse) => 
+    {
+      this.spinner.hide()
       if (apiResponse.status === 200) {
         //console.log(apiResponse);
         this.currentIssue = apiResponse.data;
@@ -69,10 +73,12 @@ export class ViewIssueComponent implements OnInit {
       }
     },
       (err) => {
+        this.spinner.hide()
         this.toastrService.error("Some error occured.");
       }
     );
     this.issueService.getallAssignees(this.currentIssueId).subscribe((apiResponse) => {
+      this.spinner.hide()
       if (apiResponse['status'] === 200) {
         //console.log(apiResponse);
         this.allAssignees = apiResponse['data'];
@@ -81,6 +87,7 @@ export class ViewIssueComponent implements OnInit {
     }
     );
     this.issueService.getallWatchers(this.currentIssueId).subscribe((apiResponse) => {
+      this.spinner.hide()
       if (apiResponse['status'] === 200) {
         //console.log(apiResponse);
         this.allWatchers = apiResponse['data']['watchersList'];
@@ -95,6 +102,7 @@ export class ViewIssueComponent implements OnInit {
     }
     );
     this.issueService.getallComments(this.currentIssueId).subscribe((apiResponse) => {
+      this.spinner.hide()
       if (apiResponse['status'] === 200) {
         console.log(apiResponse);
         this.allComments = apiResponse['data'];
@@ -328,8 +336,10 @@ export class ViewIssueComponent implements OnInit {
   }
 
   public logout() {
-
-    this.userManagementService.logout().subscribe((apiResponse) => {
+    this.spinner.show()
+    this.userManagementService.logout().subscribe((apiResponse) => 
+    {
+      this.spinner.hide()
       if (apiResponse.status === 200) {
         // this.issueService.exitSocket();
         this.cookieService.delete('authToken');
@@ -343,7 +353,8 @@ export class ViewIssueComponent implements OnInit {
       }
     },
       (err) => {
-        this.toastrService.error(err.message);
+        this.spinner.hide()
+        this.toastrService.error("Some error occured.");
       })
   }
 

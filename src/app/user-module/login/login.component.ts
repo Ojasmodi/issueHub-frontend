@@ -87,7 +87,7 @@ export class LoginComponent implements OnInit {
       .subscribe((apiResponse) => {
         this.spinner.hide()
         if (apiResponse.status === 200) {
-          console.log(apiResponse)
+          //console.log(apiResponse)
           this.cookieService.delete('authToken')
           this.cookieService.delete('userId')
           this.cookieService.delete('userName')

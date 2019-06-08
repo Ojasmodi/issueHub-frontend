@@ -93,7 +93,7 @@ export class SocketService {
 
   public addToWatchers = (data) => {
 
-    console.log("emit watcher")
+    //console.log("emit watcher")
     this.socket.emit('add-watcher', data);
   }
 
@@ -130,7 +130,7 @@ export class SocketService {
 
     } // end condition *if
 
-    console.error(errorMessage);
+    //console.error(errorMessage);
 
     return Observable.throw(errorMessage);
 

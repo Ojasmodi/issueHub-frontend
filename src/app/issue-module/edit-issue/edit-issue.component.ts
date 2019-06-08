@@ -4,6 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 import { UserManagementService } from 'src/app/user-management.service';
 import { CookieService } from 'ngx-cookie-service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'app-edit-issue',
@@ -47,10 +48,12 @@ export class EditIssueComponent implements OnInit {
   }
 
   constructor(public issueService: IssueServiceService, public toastrService: ToastrService, public _route: ActivatedRoute,
-    public router: Router, public userManagementService: UserManagementService, public cookieService: CookieService) {
+    public router: Router,
+    private spinner: NgxSpinnerService, public userManagementService: UserManagementService, public cookieService: CookieService) {
   }
 
   ngOnInit() {
+    this.spinner.show()
     this.userName = this.cookieService.get('userName');
     this.authToken = this.cookieService.get('authToken');
     this.userId = this.cookieService.get('userId')
@@ -58,6 +61,7 @@ export class EditIssueComponent implements OnInit {
     this.checkStatus();
     this.currentIssueId = this._route.snapshot.paramMap.get('id');
     this.issueService.getSingleIssue(this.currentIssueId).subscribe((apiResponse) => {
+      this.spinner.hide()
       if (apiResponse.status === 200) {
         //console.log(apiResponse);
         this.currentIssue = apiResponse.data;
@@ -67,6 +71,7 @@ export class EditIssueComponent implements OnInit {
       }
     },
       (err) => {
+        this.spinner.hide()
         this.toastrService.error(err.message);
       }
     );
@@ -129,7 +134,9 @@ export class EditIssueComponent implements OnInit {
   }
 
   update = (issueData) => {
+    this.spinner.show()
     this.issueService.updateIssue(this.currentIssueId, issueData).subscribe((apiResponse) => {
+      this.spinner.hide()
       if (apiResponse.status === 200) {
         this.toastrService.show("Issue updated.");
         this.viewAllIssues()
@@ -139,6 +146,7 @@ export class EditIssueComponent implements OnInit {
       }
     },
       err => {
+        this.spinner.hide()
         this.toastrService.error("Some Error Occured.")
       })
   }
@@ -147,8 +155,9 @@ export class EditIssueComponent implements OnInit {
     this.router.navigate(['viewAll'])
   }
   public logout() {
-
+    this.spinner.show()
     this.userManagementService.logout().subscribe((apiResponse) => {
+      this.spinner.hide()
       if (apiResponse.status === 200) {
         this.cookieService.delete('authToken');
         this.cookieService.delete('userId');
@@ -161,7 +170,8 @@ export class EditIssueComponent implements OnInit {
       }
     },
       (err) => {
-        this.toastrService.error(err.message);
+        this.spinner.hide()
+        this.toastrService.error("Some error occured.");
       })
   }
 

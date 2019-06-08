@@ -7,6 +7,7 @@ import { CookieService } from 'ngx-cookie-service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
+import { NgxSpinnerService } from 'ngx-spinner';
 import { FormGroup } from '@angular/forms';
 declare var $: any
 
@@ -21,11 +22,10 @@ export class DashboardComponent implements OnInit {
   public userInfo: any;
   public userId: any;
   public userName: any;
-  displayedColumns: string[] = ['Status', 'Title', 'ReportedBy', 'CreatedOn', 'Actions'];
+  displayedColumns: string[] = ['Status', 'Title', 'ReportedBy','CreatedOn' ,'view','Edit','Delete'];
 
   allUsers = [];
   issueTypes = ['BackLog', 'In-test', 'In-progress', 'Done']
-  haveIssue: boolean = false;
   issuesAssignedToLoginUser: MatTableDataSource<any>;
   searchKey: string;
   title: string
@@ -36,10 +36,11 @@ export class DashboardComponent implements OnInit {
   selectedFile = null;
   disconnectedSocket = true
   validImage = false;
+  public imagePath;
 
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
-  public imagePath;
+ 
 
   onImagePicked(event: Event) {
     //console.log(event)
@@ -61,7 +62,8 @@ export class DashboardComponent implements OnInit {
 
 
   constructor(public issueService: IssueServiceService, public toastrService: ToastrService,
-    public router: Router, public userManagementService: UserManagementService, public cookieService: CookieService) {
+    public router: Router,
+    private spinner: NgxSpinnerService, public userManagementService: UserManagementService, public cookieService: CookieService) {
   }
 
   ngOnInit() {
@@ -70,12 +72,14 @@ export class DashboardComponent implements OnInit {
     this.userName = this.cookieService.get('userName');
     this.userInfo = this.userManagementService.getUserInfoFromLocalStorage();
     this.checkStatus();
+    this.spinner.show()
     this.issuesAssignedToUser();
   }
 
   issuesAssignedToUser = () => {
     this.issueService.getAllIssuesByUserId(this.userId).subscribe((data) => {
       //console.log(data)
+      this.spinner.hide();
       if (data['status'] === 200) {
         this.issuesAssignedToLoginUser = new MatTableDataSource(data['data']);
         this.issuesAssignedToLoginUser.sort = this.sort;
@@ -83,6 +87,7 @@ export class DashboardComponent implements OnInit {
       }
     },
       err => {
+        this.spinner.hide();
         this.toastrService.error("Some error occured.")
       }
     );
@@ -104,22 +109,23 @@ export class DashboardComponent implements OnInit {
 
   public logout() {
 
+    this.spinner.show();
     this.userManagementService.logout().subscribe((apiResponse) => {
+      this.spinner.hide();
       if (apiResponse.status === 200) {
         this.cookieService.delete('authToken');
         this.cookieService.delete('userId');
         this.cookieService.delete('userName');
         this.toastrService.success("Logged out successfully.")
-        setTimeout(() => {
           this.router.navigate(['/']);
-        }, 1000)
       }
       else {
         this.toastrService.error(apiResponse.message);
       }
     },
       (err) => {
-        this.toastrService.error(err.message);
+        this.spinner.hide();
+        this.toastrService.error("Some error occured.");
       })
   }
 
@@ -140,6 +146,7 @@ export class DashboardComponent implements OnInit {
     }
     else {
       $('#exampleModal1').modal('toggle');
+      this.spinner.show();
       const issueData = new FormData();
       issueData.append("title", this.title);
       issueData.append("description", this.description);
@@ -147,8 +154,9 @@ export class DashboardComponent implements OnInit {
       issueData.append("reportedBy", this.userName)
       issueData.append("reportedByUserId", this.userId)
       issueData.append("image", this.selectedFile, 'image');
-      console.log(issueData.getAll)
+      //console.log(issueData.getAll)
       this.issueService.createIssue(issueData).subscribe((apiResponse) => {
+        this.spinner.hide();
         if (apiResponse.status === 200) {
           this.toastrService.show("Issue submitted");
           this.viewAllIssues()
@@ -156,6 +164,9 @@ export class DashboardComponent implements OnInit {
         else {
           this.toastrService.error("Some error occured.")
         }
+      },(err)=>{
+        this.spinner.hide();
+        this.toastrService.error("Some error occured.")
       })
     }
   }
@@ -169,10 +180,6 @@ export class DashboardComponent implements OnInit {
     this.issuesAssignedToLoginUser.filter = this.searchKey.trim().toLowerCase();
   }
 
-  public haveAnIssue = () => {
-    this.haveIssue = !this.haveIssue;
-  }
-
   public viewIssue = (id) => {
     this.router.navigate(['view', id])
   }
@@ -182,7 +189,9 @@ export class DashboardComponent implements OnInit {
   }
 
   public deleteIssue = (id) => {
+    this.spinner.show();
     this.issueService.deleteIssue(id).subscribe((apiResponse) => {
+      this.spinner.hide();
       if (apiResponse['status'] === 200) {
         this.toastrService.info(`Issue Deleted successfully.`)
         this.issuesAssignedToUser();
@@ -192,6 +201,7 @@ export class DashboardComponent implements OnInit {
       }
     },
       err => {
+        this.spinner.hide();
         this.toastrService.error(err)
       }
     );

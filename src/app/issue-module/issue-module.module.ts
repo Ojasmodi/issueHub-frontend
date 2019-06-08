@@ -11,12 +11,13 @@ import { ViewAllIssuesComponent } from './view-all-issues/view-all-issues.compon
 import { QuillModule } from 'ngx-quill';
 import { ImageUploaderModule } from 'ngx-image-uploader';
 import { EditIssueComponent } from './edit-issue/edit-issue.component';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 @NgModule({
   declarations: [DashboardComponent, ViewIssueComponent, ViewAllIssuesComponent, EditIssueComponent],
   imports: [
     CommonModule,  FormsModule, BrowserAnimationsModule,
-    MaterialModule, QuillModule,ImageUploaderModule,
+    MaterialModule, QuillModule,ImageUploaderModule, NgxSpinnerModule,
     // required animations module
     ToastrModule.forRoot(),
     RouterModule.forChild([

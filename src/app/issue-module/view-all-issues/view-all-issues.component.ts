@@ -7,6 +7,7 @@ import { CookieService } from 'ngx-cookie-service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'app-view-all-issues',
@@ -14,7 +15,7 @@ import { MatSort } from '@angular/material/sort';
   styleUrls: ['./view-all-issues.component.css']
 })
 export class ViewAllIssuesComponent implements OnInit {
-  displayedColumns: string[] = ['Status', 'Title', 'ReportedBy', 'CreatedOn', 'Actions'];
+  displayedColumns: string[] = ['Status', 'Title', 'ReportedBy','CreatedOn' ,'view','Edit','Delete'];
   allIssues: MatTableDataSource<any>;
   issueTypes = ['BackLog', 'In-test', 'In-progress', 'Done']
   userName;
@@ -26,14 +27,14 @@ export class ViewAllIssuesComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
   constructor(public issueService: IssueServiceService, public toastrService: ToastrService,
-    public router: Router, public userManagementService: UserManagementService, public cookieService: CookieService) { }
+    public router: Router,private spinner: NgxSpinnerService, public userManagementService: UserManagementService, public cookieService: CookieService) { }
 
   ngOnInit() {
     this.authToken = this.cookieService.get('authToken')
     this.userName = this.cookieService.get('userName')
     this.userId = this.cookieService.get('userId');
     this.checkStatus();
-    this.issuesAssignedToUser();
+    this.getAllIssues();
   }
 
   public checkStatus = () => {
@@ -50,8 +51,10 @@ export class ViewAllIssuesComponent implements OnInit {
   } // end checkStatus
 
 
-  issuesAssignedToUser() {
+  getAllIssues() {
+    this.spinner.show()
     this.issueService.getAllIssues().subscribe((data) => {
+      this.spinner.hide()
       if (data.status === 200) {
         this.allIssues = new MatTableDataSource(data.data);
         this.allIssues.sort = this.sort;
@@ -60,6 +63,7 @@ export class ViewAllIssuesComponent implements OnInit {
       }
     },
       err => {
+        this.spinner.hide()
         this.toastrService.error("Some error occured.")
       });
   }
@@ -81,8 +85,9 @@ export class ViewAllIssuesComponent implements OnInit {
     this.router.navigate(['edit', id])
   }
   public logout() {
-
+    this.spinner.show()
     this.userManagementService.logout().subscribe((apiResponse) => {
+      this.spinner.hide()
       if (apiResponse.status === 200) {
         this.cookieService.delete('authToken');
         this.cookieService.delete('userId');
@@ -95,21 +100,25 @@ export class ViewAllIssuesComponent implements OnInit {
       }
     },
       (err) => {
+        this.spinner.hide()
         this.toastrService.error("Some Error Occured.");
       })
   }
 
   public deleteIssue = (id) => {
+    this.spinner.show()
     this.issueService.deleteIssue(id).subscribe((apiResponse) => {
+      this.spinner.hide()
       if (apiResponse['status'] === 200) {
         this.toastrService.info(`Issue Deleted successfully.`)
-        this.issuesAssignedToUser();
+        this.getAllIssues();
       }
       else {
         this.toastrService.error(apiResponse['message'])
       }
     },
       err => {
+        this.spinner.hide()
         this.toastrService.error(err)
       }
     );
