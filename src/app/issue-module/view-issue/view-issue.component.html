@@ -28,9 +28,7 @@
 <div *ngIf="issueNotFound">
   <img src="./../../../assets/images.jpg" alt="Not found" class="img-fluid rounded mx-auto d-block img-responsive">
 </div>
-
 <div class="container p-4" *ngIf="!issueNotFound">
-
   <div class="card mat-elevation-z8" style='margin: "2%"' *ngIf="currentIssue">
     <div class="card-header text-center font-weight-bold bg-secondary text-white">
       Title: {{currentIssue.title}}
@@ -43,12 +41,9 @@
             yourself to watcher's list</button>
         </div>
       </div>
-
-
       <div class="row">
         <div class="col-sm-6">
           <img class="img-responsive" [src]="currentIssue.screenshot" alt="Smiley face" height="100%" width="100%">
-
         </div>
         <div class="col-sm-6">
           <form class="text-responsive">
@@ -60,7 +55,6 @@
               <label class="text-info font-weight-bold">Description:</label>
               <div [innerHtml]="currentIssue.description"></div>
             </div>
-
             <div class="form-group">
               <label class="text-info font-weight-bold">Reported By:</label>
               <input type="text" class="input-group input-group-sm mb-3 text-capitalize" disabled
@@ -71,7 +65,6 @@
               <textarea type="text" class="input-group input-group-sm mb-3"
                 disabled>{{currentIssue.createdOn|date}}</textarea>
             </div>
-
             <div class="form-group">
               <label class="text-info font-weight-bold">Assignees:</label>
               <div class="row" *ngFor="let assignee of allAssignees">
@@ -86,7 +79,6 @@
                 Not assigned to anyone.
               </div>
             </div>
-
             <div class="form-group" *ngIf="canAssignIssueToOtherUsers || currentIssue.reportedByUserId==this.userId">
               <label class="text-info font-weight-bold">Add assignee</label>
               <select class="text-capitalize form-control form-control-sm" [(ngModel)]="currentAssignee"
@@ -98,7 +90,7 @@
             <div class="form-group">
               <label class="text-info font-weight-bold">Watchers:</label>
               <div *ngIf="allWatchers.length==0">
-                  No watchers yet.
+                No watchers yet.
               </div>
               <ul class="list-group watcher" *ngIf="allWatchers">
                 <li *ngFor="let watcher of allWatchers" class="list-group-item">{{watcher.userName}}</li>
@@ -109,19 +101,15 @@
         </div>
       </div>
     </div>
-
   </div>
-
   <br>
   <br>
   <div>
-
     <div *ngIf="allComments">
       <h4>Comment:</h4>
       <textarea type="text" class="form-control" [(ngModel)]="comment" name="comment"></textarea>
       <button class="btn btn-primary btn-sm m-1" (click)="addComment()">Add Comment</button>
     </div>
-
     <div *ngIf="allComments">
       <div *ngFor="let comment of allComments">
         <div class="card border border-primary">
@@ -138,4 +126,5 @@
       </div>
     </div>
   </div>
-  <ngx-spinner></ngx-spinner>
+</div>
+<ngx-spinner></ngx-spinner>

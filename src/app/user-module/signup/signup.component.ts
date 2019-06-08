@@ -29,16 +29,13 @@ export class SignupComponent implements OnInit {
   ngOnInit() {
   }
 
-  logIn = () => {
-    this.router.navigate(['/login']);
-  }
-
+  // function to go back to login page
   public goToSignIn: any = () => {
     this.router.navigate(['/']);
-  } // end goToSignIn
+  }
 
+  // function for sign up
   public signupFunction: any = () => {
-
     if (!this.firstName || this.firstName.trim().length == 0) {
       this.toastr.warning('Enter first name.')
     } else if (!this.lastName || this.lastName.trim().length == 0) {
@@ -51,8 +48,8 @@ export class SignupComponent implements OnInit {
     else if (!this.verifyEmail(this.email)) {
       this.toastr.warning('Enter valid email.')
     }
-    else if (!this.password || this.password.trim().length == 0) {
-      this.toastr.warning('Enter password.')
+    else if (!this.password || this.password.trim().length < 8) {
+      this.toastr.warning('Enter valid password.')
     }
     else {
       this.spinner.show()
@@ -63,43 +60,30 @@ export class SignupComponent implements OnInit {
         email: this.email.trim(),
         password: this.password.trim(),
       };
-      //console.log(data);
-
+      // console.log(data);
       this.appService.signupFunction(data)
         .subscribe((apiResponse) => {
-
           this.spinner.hide()
-
           if (apiResponse.status === 200) {
-
             this.toastr.success('Signup successful!')
-
             this.goToSignIn();
-
-
           } else {
-
             this.toastr.error(apiResponse.message);
-
           }
-
         }, (err) => {
           this.spinner.hide()
           this.toastr.error('Some error occured.');
-
         });
-
     } // end condition
-
   } // end signupFunction
 
-
+  // function to verify for valid email
   public verifyEmail = (email) => {
-    let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
+    const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
     if (email.match(emailRegex)) {
-      return true
+      return true;
     } else {
-      return false
+      return false;
     }
   }
 }

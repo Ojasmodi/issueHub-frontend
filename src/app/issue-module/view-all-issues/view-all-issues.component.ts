@@ -14,8 +14,9 @@ import { NgxSpinnerService } from 'ngx-spinner';
   templateUrl: './view-all-issues.component.html',
   styleUrls: ['./view-all-issues.component.css']
 })
+
 export class ViewAllIssuesComponent implements OnInit {
-  displayedColumns: string[] = ['Status', 'Title', 'ReportedBy','CreatedOn' ,'view','Edit','Delete'];
+  displayedColumns: string[] = ['Status', 'Title', 'ReportedBy', 'CreatedOn', 'view', 'Edit', 'Delete'];
   allIssues: MatTableDataSource<any>;
   issueTypes = ['BackLog', 'In-test', 'In-progress', 'Done']
   userName;
@@ -27,7 +28,8 @@ export class ViewAllIssuesComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
   constructor(public issueService: IssueServiceService, public toastrService: ToastrService,
-    public router: Router,private spinner: NgxSpinnerService, public userManagementService: UserManagementService, public cookieService: CookieService) { }
+              public router: Router, private spinner: NgxSpinnerService,
+              public userManagementService: UserManagementService, public cookieService: CookieService) { }
 
   ngOnInit() {
     this.authToken = this.cookieService.get('authToken')
@@ -37,8 +39,8 @@ export class ViewAllIssuesComponent implements OnInit {
     this.getAllIssues();
   }
 
+  // function to check whether user is logged in or not
   public checkStatus = () => {
-
     if (this.cookieService.get('authToken') === undefined || this.cookieService.get('authToken') === '' ||
       this.cookieService.get('authToken') === null) {
       this.toastrService.error("Please login first.");
@@ -47,11 +49,10 @@ export class ViewAllIssuesComponent implements OnInit {
     } else {
       return true
     }
+  }
 
-  } // end checkStatus
-
-
-  getAllIssues() {
+  // function to get all issues
+  getAllIssues = () => {
     this.spinner.show()
     this.issueService.getAllIssues().subscribe((data) => {
       this.spinner.hide()
@@ -68,43 +69,28 @@ export class ViewAllIssuesComponent implements OnInit {
       });
   }
 
-  onSearchClear() {
+  // function to clear filter rows result
+  onSearchClear = () => {
     this.searchKey = '';
     this.applyFilter();
   }
 
-  applyFilter() {
+  // function to filter rows
+  applyFilter = () => {
     this.allIssues.filter = this.searchKey.trim().toLowerCase();
   }
 
+  // function for navigating to view issue component
   public viewIssue = (id) => {
     this.router.navigate(['view', id])
   }
 
+  // function for navigating to edit issue component
   public editIssue = (id) => {
     this.router.navigate(['edit', id])
   }
-  public logout() {
-    this.spinner.show()
-    this.userManagementService.logout().subscribe((apiResponse) => {
-      this.spinner.hide()
-      if (apiResponse.status === 200) {
-        this.cookieService.delete('authToken');
-        this.cookieService.delete('userId');
-        this.cookieService.delete('userName');
-        this.toastrService.success("Logged out successfully.")
-        this.router.navigate(['/']);
-      }
-      else {
-        this.toastrService.error(apiResponse.message);
-      }
-    },
-      (err) => {
-        this.spinner.hide()
-        this.toastrService.error("Some Error Occured.");
-      })
-  }
 
+  // function to delete issue
   public deleteIssue = (id) => {
     this.spinner.show()
     this.issueService.deleteIssue(id).subscribe((apiResponse) => {
@@ -122,6 +108,28 @@ export class ViewAllIssuesComponent implements OnInit {
         this.toastrService.error(err)
       }
     );
+  }
+
+  // function to logout user
+  public logout = () => {
+    this.spinner.show();
+    this.userManagementService.logout().subscribe((apiResponse) => {
+      this.spinner.hide();
+      if (apiResponse.status === 200) {
+        this.cookieService.delete('authToken');
+        this.cookieService.delete('userId');
+        this.cookieService.delete('userName');
+        this.toastrService.success("Logged out successfully.")
+        this.router.navigate(['/']);
+      }
+      else {
+        this.toastrService.error(apiResponse.message);
+      }
+    },
+      (err) => {
+        this.spinner.hide();
+        this.toastrService.error("Some error occured.");
+      })
   }
 
 }

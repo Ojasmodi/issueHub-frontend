@@ -25,17 +25,15 @@
   </div>
 </nav>
 <br>
-
 <div class="container">
   <div class="card mat-elevation-z8 m-4" style='margin: "2%";' *ngIf="currentIssue">
     <div class="card-header text-center font-weight-bold bg-secondary text-white">
-      Title: {{currentIssue.title}}
+      <span class="text-danger">Title:</span> {{currentIssue.title}}
     </div>
     <div class="card-body">
       <div class="row">
         <div class="col-sm-6">
           <img class="img-responsive" [src]="currentIssue.screenshot" alt="Smiley face" height="100%" width="100%">
-
         </div>
         <div class="col-sm-6">
           <form class="text-responsive">
@@ -70,7 +68,6 @@
         </div>
       </div>
     </div>
-
   </div>
 </div>
 <ngx-spinner></ngx-spinner>

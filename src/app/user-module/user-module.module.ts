@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { LoginComponent } from './login/login.component';
 import { SignupComponent } from './signup/signup.component';
 import { SocialLoginModule, AuthServiceConfig } from "angularx-social-login";
-import { GoogleLoginProvider, FacebookLoginProvider } from "angularx-social-login";
+import { GoogleLoginProvider } from 'angularx-social-login';
 import { FormsModule } from '@angular/forms';
 import { ToastrModule } from 'ngx-toastr';
 import { RouterModule } from '@angular/router';
@@ -18,8 +18,8 @@ let config = new AuthServiceConfig([
   }
 ]);
 
-export function provideConfig() { 
-  return config;   
+export function provideConfig() {
+  return config;
 }
 
 @NgModule({
@@ -27,12 +27,12 @@ export function provideConfig() {
   imports: [
     CommonModule, SocialLoginModule, FormsModule, BrowserAnimationsModule,
     NgxSpinnerModule,
-    ToastrModule.forRoot() ,
+    ToastrModule.forRoot(),
     RouterModule.forChild([
       { path: 'signup', component: SignupComponent },
     ])
   ],
-  providers:[{
+  providers: [{
     provide: AuthServiceConfig,
     useFactory: provideConfig
   }]

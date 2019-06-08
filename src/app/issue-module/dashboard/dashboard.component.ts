@@ -8,7 +8,6 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { FormGroup } from '@angular/forms';
 declare var $: any
 
 @Component({
@@ -16,14 +15,14 @@ declare var $: any
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
+
 export class DashboardComponent implements OnInit {
 
   public authToken: any;
   public userInfo: any;
   public userId: any;
   public userName: any;
-  displayedColumns: string[] = ['Status', 'Title', 'ReportedBy','CreatedOn' ,'view','Edit','Delete'];
-
+  displayedColumns: string[] = ['Status', 'Title', 'ReportedBy', 'CreatedOn', 'view', 'Edit', 'Delete'];
   allUsers = [];
   issueTypes = ['BackLog', 'In-test', 'In-progress', 'Done']
   issuesAssignedToLoginUser: MatTableDataSource<any>;
@@ -31,8 +30,6 @@ export class DashboardComponent implements OnInit {
   title: string
   description: string
   status: string
-  form: FormGroup;
-  imagePreview: string;
   selectedFile = null;
   disconnectedSocket = true
   validImage = false;
@@ -40,12 +37,38 @@ export class DashboardComponent implements OnInit {
 
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
- 
 
-  onImagePicked(event: Event) {
+  constructor(public issueService: IssueServiceService, public toastrService: ToastrService,
+    public router: Router, private spinner: NgxSpinnerService,
+    public userManagementService: UserManagementService, public cookieService: CookieService) {
+  }
+
+  ngOnInit() {
+    this.authToken = this.cookieService.get('authToken');
+    this.userId = this.cookieService.get('userId');
+    this.userName = this.cookieService.get('userName');
+    this.userInfo = this.userManagementService.getUserInfoFromLocalStorage();
+    this.checkStatus();
+    this.spinner.show()
+    this.issuesAssignedToUser();
+  }
+
+  // function to check whether user is logged in or not
+  public checkStatus = () => {
+    if (this.cookieService.get('authToken') === undefined || this.cookieService.get('authToken') === '' ||
+      this.cookieService.get('authToken') === null) {
+      this.toastrService.error("Please login first.");
+      this.router.navigate(['/']);
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  // function to get issue image when photo is selected by user
+  onImagePicked = (event: Event) => {
     //console.log(event)
     let file = (event.target as HTMLInputElement).files[0];
-    //console.log(file.name)
     if (file.size > (5 * 1024 * 1024)) {
       this.toastrService.warning("Please select a file less than 5 MB")
       this.validImage = false;
@@ -60,22 +83,7 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-
-  constructor(public issueService: IssueServiceService, public toastrService: ToastrService,
-    public router: Router,
-    private spinner: NgxSpinnerService, public userManagementService: UserManagementService, public cookieService: CookieService) {
-  }
-
-  ngOnInit() {
-    this.authToken = this.cookieService.get('authToken');
-    this.userId = this.cookieService.get('userId');
-    this.userName = this.cookieService.get('userName');
-    this.userInfo = this.userManagementService.getUserInfoFromLocalStorage();
-    this.checkStatus();
-    this.spinner.show()
-    this.issuesAssignedToUser();
-  }
-
+  // function to get all issues by userId or assignee
   issuesAssignedToUser = () => {
     this.issueService.getAllIssuesByUserId(this.userId).subscribe((data) => {
       //console.log(data)
@@ -93,44 +101,8 @@ export class DashboardComponent implements OnInit {
     );
   };
 
-  public checkStatus = () => {
-
-    if (this.cookieService.get('authToken') === undefined || this.cookieService.get('authToken') === '' ||
-      this.cookieService.get('authToken') === null) {
-      this.toastrService.error("Please login first.");
-      this.router.navigate(['/']);
-      return false;
-    } else {
-      return true;
-    }
-  } // end checkStatus
-
-
-
-  public logout() {
-
-    this.spinner.show();
-    this.userManagementService.logout().subscribe((apiResponse) => {
-      this.spinner.hide();
-      if (apiResponse.status === 200) {
-        this.cookieService.delete('authToken');
-        this.cookieService.delete('userId');
-        this.cookieService.delete('userName');
-        this.toastrService.success("Logged out successfully.")
-          this.router.navigate(['/']);
-      }
-      else {
-        this.toastrService.error(apiResponse.message);
-      }
-    },
-      (err) => {
-        this.spinner.hide();
-        this.toastrService.error("Some error occured.");
-      })
-  }
-
-
-  createIssue() {
+  // function to create issue
+  createIssue = () => {
     if (!this.title || this.title.trim().length == 0) {
       this.toastrService.warning("Enter title!")
     }
@@ -164,30 +136,35 @@ export class DashboardComponent implements OnInit {
         else {
           this.toastrService.error("Some error occured.")
         }
-      },(err)=>{
+      }, (err) => {
         this.spinner.hide();
         this.toastrService.error("Some error occured.")
       })
     }
   }
 
-  onSearchClear() {
+  // function to clear filter rows result
+  onSearchClear = () => {
     this.searchKey = '';
     this.applyFilter();
   }
 
-  applyFilter() {
+  // function to filter rows
+  applyFilter = () => {
     this.issuesAssignedToLoginUser.filter = this.searchKey.trim().toLowerCase();
   }
 
+  // function for navigating to view issue component
   public viewIssue = (id) => {
     this.router.navigate(['view', id])
   }
 
+  // function for navigating to edit issue component
   public editIssue = (id) => {
     this.router.navigate(['edit', id])
   }
 
+  // function to delete issue
   public deleteIssue = (id) => {
     this.spinner.show();
     this.issueService.deleteIssue(id).subscribe((apiResponse) => {
@@ -207,9 +184,30 @@ export class DashboardComponent implements OnInit {
     );
   }
 
+  // function to navigate to allIssues page
   public viewAllIssues = () => {
     this.router.navigate(['viewAll'])
   }
 
-
+  // function to logout user
+  public logout = () => {
+    this.spinner.show();
+    this.userManagementService.logout().subscribe((apiResponse) => {
+      this.spinner.hide();
+      if (apiResponse.status === 200) {
+        this.cookieService.delete('authToken');
+        this.cookieService.delete('userId');
+        this.cookieService.delete('userName');
+        this.toastrService.success("Logged out successfully.")
+        this.router.navigate(['/']);
+      }
+      else {
+        this.toastrService.error(apiResponse.message);
+      }
+    },
+      (err) => {
+        this.spinner.hide();
+        this.toastrService.error("Some error occured.");
+      })
+  }
 }

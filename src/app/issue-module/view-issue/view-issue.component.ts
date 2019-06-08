@@ -14,6 +14,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
   styleUrls: ['./view-issue.component.css'],
   providers: [SocketService]
 })
+
 export class ViewIssueComponent implements OnInit {
 
   public authToken: any;
@@ -41,11 +42,13 @@ export class ViewIssueComponent implements OnInit {
   liveConSubs: Subscription
 
   constructor(public issueService: IssueServiceService, public toastrService: ToastrService, public _route: ActivatedRoute,
-    public router: Router,private spinner: NgxSpinnerService, public userManagementService: UserManagementService, public socketService: SocketService, public cookieService: CookieService) {
-    this.userName = this.cookieService.get('userName');
+              public router: Router, private spinner: NgxSpinnerService,
+              public userManagementService: UserManagementService, public socketService: SocketService, public cookieService: CookieService) {
+
   }
 
   ngOnInit() {
+    this.userName = this.cookieService.get('userName');
     this.authToken = this.cookieService.get('authToken');
     this.userId = this.cookieService.get('userId')
     this.userInfo = this.userManagementService.getUserInfoFromLocalStorage();
@@ -58,13 +61,10 @@ export class ViewIssueComponent implements OnInit {
     this.deletedComment();
     this.getWatcher();
     this.callDisconnectedSocket();
-
     this.currentIssueId = this._route.snapshot.paramMap.get('id');
-    this.issueService.getSingleIssue(this.currentIssueId).subscribe((apiResponse) => 
-    {
+    this.issueService.getSingleIssue(this.currentIssueId).subscribe((apiResponse) => {
       this.spinner.hide()
       if (apiResponse.status === 200) {
-        //console.log(apiResponse);
         this.currentIssue = apiResponse.data;
       }
       else if (apiResponse.status == 404) {
@@ -111,18 +111,17 @@ export class ViewIssueComponent implements OnInit {
     );
   }
 
+  // function to  verify user confirmation
   public verifyUserConfirmation: any = () => {
-
     this.userSubs = this.socketService.verifyUser()
       .subscribe((data) => {
-
         this.disconnectedSocket = false;
         this.toastrService.success("Connection is live.")
         this.socketService.setUser(this.authToken);
       });
   }
 
-
+  // function to check watcher is present or not for enabling/disabling add to watcher button
   checkIfWatcherPresent = (watchersList) => {
     for (let watcher of watchersList) {
       if (watcher.userId == this.userId) {
@@ -132,6 +131,7 @@ export class ViewIssueComponent implements OnInit {
     }
   }
 
+  // function to check if assignee is present or not so that to check he is able to assign issue to other users or not
   checkIfAssigneePresent = (assignees) => {
     for (let assignee of assignees) {
       if (assignee.assignedToId == this.userId) {
@@ -144,8 +144,8 @@ export class ViewIssueComponent implements OnInit {
     }
   };
 
+  // function to check whether user is logged in or not
   public checkStatus = () => {
-
     if (this.cookieService.get('authToken') === undefined || this.cookieService.get('authToken') === '' ||
       this.cookieService.get('authToken') === null) {
       this.toastrService.error("Please login first.");
@@ -156,6 +156,7 @@ export class ViewIssueComponent implements OnInit {
     }
   }
 
+  // function to add assignee
   addAssignee = () => {
     if (!this.currentAssignee) {
       this.toastrService.warning("Select a assignee!")
@@ -175,6 +176,7 @@ export class ViewIssueComponent implements OnInit {
     }
   }
 
+  // function to get new assignee when it is created
   updatedAssigneeList = () => {
     this.updatedAssigneeSubs = this.socketService.updatedAssigneeList().subscribe((apiResponse) => {
       //console.log(apiResponse)
@@ -200,6 +202,7 @@ export class ViewIssueComponent implements OnInit {
       });
   }
 
+  // function to emit delete assignee event
   deleteAssignee = (assignee) => {
     if (this.disconnectedSocket == true) {
       this.toastrService.error("Network problem.")
@@ -209,6 +212,7 @@ export class ViewIssueComponent implements OnInit {
     }
   }
 
+  // function to get deleted assignee
   deletedAssignee = () => {
     this.deletedAssigneeSubs = this.socketService.deletedAssignee().subscribe((apiResponse) => {
       //console.log(apiResponse)
@@ -239,6 +243,7 @@ export class ViewIssueComponent implements OnInit {
       });
   }
 
+  // function to emit add comment event
   addComment = () => {
     if (!this.comment) {
       this.toastrService.warning("Comment field is blank!")
@@ -258,6 +263,7 @@ export class ViewIssueComponent implements OnInit {
     }
   }
 
+  // function to emit delete comment event
   deleteComment = (comment) => {
     if (this.disconnectedSocket == true) {
       this.toastrService.error("Network problem.")
@@ -267,10 +273,9 @@ export class ViewIssueComponent implements OnInit {
     }
   }
 
+  // function to get deleted comment
   deletedComment = () => {
     this.deletedCommentsSubs = this.socketService.deletedComment().subscribe((apiResponse) => {
-      //console.log("response is")
-      //console.log(apiResponse)
       if (apiResponse.status == 200) {
         if (apiResponse.data.issueId === this.currentIssueId) {
           this.toastrService.info(`${apiResponse.data.creatorName} has removed his comment.`)
@@ -297,6 +302,7 @@ export class ViewIssueComponent implements OnInit {
       });
   }
 
+  // function to get new comment when it is created
   updatedComments = () => {
     this.updatedCommentsSubs = this.socketService.updatedComments().subscribe((apiResponse) => {
       //console.log(apiResponse)
@@ -321,6 +327,7 @@ export class ViewIssueComponent implements OnInit {
       });
   }
 
+  // function to add watcher
   addToWatchers = () => {
     if (this.disconnectedSocket == true) {
       this.toastrService.error("Network problem.")
@@ -332,16 +339,14 @@ export class ViewIssueComponent implements OnInit {
       }
       this.socketService.addToWatchers(data);
     }
-
   }
 
-  public logout() {
+  // function to logout user
+  public logout = () => {
     this.spinner.show()
-    this.userManagementService.logout().subscribe((apiResponse) => 
-    {
+    this.userManagementService.logout().subscribe((apiResponse) => {
       this.spinner.hide()
       if (apiResponse.status === 200) {
-        // this.issueService.exitSocket();
         this.cookieService.delete('authToken');
         this.cookieService.delete('userId');
         this.cookieService.delete('userName');
@@ -358,9 +363,10 @@ export class ViewIssueComponent implements OnInit {
       })
   }
 
+  // function to get new watcher when it is created
   getWatcher = () => {
     this.getWatcherSubs = this.socketService.getWatcher().subscribe((apiResponse) => {
-      //console.log(apiResponse)
+      // console.log(apiResponse)
       if (apiResponse.status == 200) {
         if (apiResponse.data.issueId === this.currentIssueId) {
           this.toastrService.show(`A new watcher is added to the list.`)
@@ -381,6 +387,7 @@ export class ViewIssueComponent implements OnInit {
       });
   }
 
+  // function to check whether connection is established or not
   callDisconnectedSocket = () => {
     this.liveConSubs = this.socketService.disconnectedSocket().subscribe(() => {
       this.disconnectedSocket = true;
@@ -395,7 +402,7 @@ export class ViewIssueComponent implements OnInit {
     this.updatedAssigneeSubs.unsubscribe()
     this.deletedAssigneeSubs.unsubscribe();
     this.userSubs.unsubscribe();
-
+    this.liveConSubs.unsubscribe();
   }
 
 

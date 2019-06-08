@@ -18,17 +18,17 @@ export class LoginComponent implements OnInit {
   public email: string;
   public password: string;
   public forget_email: string;
-  public toggle: boolean = false;
 
   constructor(public _route: ActivatedRoute, public router: Router, private toastr: ToastrService,
-    private appService: UserManagementService, private cookieService: CookieService,
-    private authService: AuthService,public spinner: NgxSpinnerService) {
+              private appService: UserManagementService, private cookieService: CookieService,
+              private authService: AuthService, public spinner: NgxSpinnerService) {
   }
 
   ngOnInit() {
   }
 
-  resetPassword() {
+  // function to reset password
+  resetPassword = () => {
     if (!this.forget_email || this.forget_email.trim().length == 0) {
       this.toastr.warning("Email field can't be blank!")
     }
@@ -56,14 +56,12 @@ export class LoginComponent implements OnInit {
           this.spinner.hide()
           this.toastr.error('Some error occured.')
         });
-
     } // end condition
     this.forget_email = ""
   }
 
-
-  public signin() {
-
+  // function for sign-in  with email and password
+  public signin = () => {
     if (!this.email || this.email.trim().length == 0) {
       this.toastr.warning('Enter email')
     }
@@ -72,49 +70,35 @@ export class LoginComponent implements OnInit {
     }
     else {
       this.spinner.show()
-      this.signIn();
+      let data = {
+        email: this.email,
+        password: this.password
+      }
+      this.appService.signinFunction(data)
+        .subscribe((apiResponse) => {
+          this.spinner.hide()
+          if (apiResponse.status === 200) {
+            // console.log(apiResponse)
+            this.cookieService.delete('authToken')
+            this.cookieService.delete('userId')
+            this.cookieService.delete('userName')
+            this.cookieService.set('authToken', apiResponse.data.authToken);
+            this.cookieService.set('userId', apiResponse.data.userDetails.userId);
+            this.cookieService.set('userName', apiResponse.data.userDetails.firstName + ' ' + apiResponse.data.userDetails.lastName);
+            this.appService.setUserInfoInLocalStorage(apiResponse.data.userDetails)
+            this.toastr.show('Login Successful');
+            this.router.navigate(['/dashboard']);
+          } else {
+            this.toastr.error(apiResponse.message)
+          }
+        }, (err) => {
+          this.spinner.hide()
+          this.toastr.error('Some error occured')
+        });
     }
-  } // end signinFunction
+  }
 
-  signIn = () => {
-
-    let data = {
-      email: this.email,
-      password: this.password
-    }
-
-    this.appService.signinFunction(data)
-      .subscribe((apiResponse) => {
-        this.spinner.hide()
-        if (apiResponse.status === 200) {
-          //console.log(apiResponse)
-          this.cookieService.delete('authToken')
-          this.cookieService.delete('userId')
-          this.cookieService.delete('userName')
-          this.cookieService.set('authToken', apiResponse.data.authToken);
-
-          this.cookieService.set('userId', apiResponse.data.userDetails.userId);
-
-          this.cookieService.set('userName', apiResponse.data.userDetails.firstName + ' ' + apiResponse.data.userDetails.lastName);
-
-          this.appService.setUserInfoInLocalStorage(apiResponse.data.userDetails)
-
-          this.toastr.show('Login Successful');
-
-          this.router.navigate(['/dashboard']);
-
-
-        } else {
-          this.toastr.error(apiResponse.message)
-        }
-      }, (err) => {
-        this.spinner.hide()
-        this.toastr.error('Some error occured')
-      });
-
-  } // end condition
-
-
+  // function for sign in with google/social login
   signInWithGoogle(): any {
     this.authService.signIn(GoogleLoginProvider.PROVIDER_ID).then((user) => {
       let data = {
@@ -127,33 +111,23 @@ export class LoginComponent implements OnInit {
         .subscribe((apiResponse) => {
           this.spinner.hide()
           if (apiResponse.status === 200) {
-            console.log(apiResponse)
+            // console.log(apiResponse)
             this.cookieService.delete('authToken')
             this.cookieService.delete('userId')
             this.cookieService.delete('userName')
             this.cookieService.set('authToken', apiResponse.data.authToken);
-
             this.cookieService.set('userId', apiResponse.data.userDetails.userId);
-
             this.cookieService.set('userName', apiResponse.data.userDetails.firstName + ' ' + apiResponse.data.userDetails.lastName);
-
             this.appService.setUserInfoInLocalStorage(apiResponse.data.userDetails)
-
             this.toastr.show('Login Successful');
-
             this.router.navigate(['/dashboard']);
-
           } else {
-
-            this.toastr.error("error")
+            this.toastr.error("Error")
           }
         }, (err) => {
           this.spinner.hide()
           this.toastr.error('Some error occured')
-
         });
     })
-
-
   }
 }

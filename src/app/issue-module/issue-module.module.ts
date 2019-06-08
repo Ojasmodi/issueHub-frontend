@@ -16,9 +16,8 @@ import { NgxSpinnerModule } from 'ngx-spinner';
 @NgModule({
   declarations: [DashboardComponent, ViewIssueComponent, ViewAllIssuesComponent, EditIssueComponent],
   imports: [
-    CommonModule,  FormsModule, BrowserAnimationsModule,
-    MaterialModule, QuillModule,ImageUploaderModule, NgxSpinnerModule,
-    // required animations module
+    CommonModule, FormsModule, BrowserAnimationsModule,
+    MaterialModule, QuillModule, ImageUploaderModule, NgxSpinnerModule,
     ToastrModule.forRoot(),
     RouterModule.forChild([
       { path: 'dashboard', component: DashboardComponent },
