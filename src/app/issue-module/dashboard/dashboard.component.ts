@@ -27,11 +27,11 @@ export class DashboardComponent implements OnInit {
   issueTypes = ['BackLog', 'In-test', 'In-progress', 'Done']
   issuesAssignedToLoginUser: MatTableDataSource<any>;
   searchKey: string;
-  title: string
-  description: string
-  status: string
+  title: string;
+  description: string;
+  status: string;
   selectedFile = null;
-  disconnectedSocket = true
+  disconnectedSocket = true;
   validImage = false;
   public imagePath;
 
@@ -49,7 +49,7 @@ export class DashboardComponent implements OnInit {
     this.userName = this.cookieService.get('userName');
     this.userInfo = this.userManagementService.getUserInfoFromLocalStorage();
     this.checkStatus();
-    this.spinner.show()
+    this.spinner.show();
     this.issuesAssignedToUser();
   }
 
@@ -126,7 +126,7 @@ export class DashboardComponent implements OnInit {
       issueData.append("reportedBy", this.userName)
       issueData.append("reportedByUserId", this.userId)
       issueData.append("image", this.selectedFile, 'image');
-      //console.log(issueData.getAll)
+      // console.log(issueData.getAll)
       this.issueService.createIssue(issueData).subscribe((apiResponse) => {
         this.spinner.hide();
         if (apiResponse.status === 200) {
