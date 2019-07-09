@@ -2,7 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { LoginComponent } from './user-module/login/login.component';
 import { CookieService } from 'ngx-cookie-service';
 import { UserModuleModule } from './user-module/user-module.module';
@@ -28,4 +28,13 @@ import { NgxSpinnerModule } from 'ngx-spinner';
   providers: [ CookieService],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule { 
+  constructor(private router: Router) {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        (<any>window).ga('set', 'page', event.urlAfterRedirects);
+        (<any>window).ga('send', 'pageview');
+      }
+    })
+  }
+}
